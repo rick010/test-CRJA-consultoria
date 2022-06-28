@@ -1,10 +1,15 @@
 package com.ricardosoftcom.testparadev.servicos;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +35,36 @@ public class TarefaServico {
 	DepartamentoRepositorio departamentoRepositorio;
 	
 	@Transactional(readOnly = true)
-	public Page<TarefaDTO> findAllPaged(Pageable pageable) {
-		Page<Tarefa> list = repositorio.findAll(pageable);
-		return list.map(x -> new TarefaDTO(x));
+	public List<TarefaDTO> todasTarefas() {
+		List<Tarefa> list = repositorio.findAll(Sort.by("prazo"));
+		List<TarefaDTO> listTarefa = new ArrayList<>();
+		for(Tarefa t : list) {
+			TarefaDTO dto = new TarefaDTO(t);
+			if(t.getPessoa() != null) {
+				dto.setMensagem("Encaminhado para "+ t.getPessoa().getNome());
+				listTarefa.add(dto);
+			}else if (t.getPessoa() == null){
+				dto.setMensagem("Pendente " + " Totol de horas gastas: " +totalHorasGastasPorTodasTarefas(t.getId()));
+				listTarefa.add(dto);
+			}
+		}
+		return listTarefa;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<TarefaDTO> tarefasSemPessoasAlocadas() {
+		List<Tarefa> list = repositorio.findAll(Sort.by("prazo"));
+		List<TarefaDTO> listTarefa = new ArrayList<>();
+		for(Tarefa t : list) {
+			if(t.getPessoa() == null) {
+				listTarefa.add(new TarefaDTO(t));
+			}
+		}
+		return listTarefa;
 	}
 	
 	@Transactional
-	public TarefaDTO alocarPessoa(TarefaDTO dto) {
+	public TarefaDTO adicionarTarefa(TarefaDTO dto) {
 		Tarefa entity = new Tarefa();
 		copyyDtoToEntity(dto, entity);
 		entity = repositorio.save(entity);
@@ -44,12 +72,14 @@ public class TarefaServico {
 	}
 	
 	@Transactional
-	public TarefaDTO insertPessoaNaTarefa(Long id, TarefaDTO dto) {
+	public TarefaDTO alocarPessoaNaTarefa(Long id, TarefaDTO dto) {
 		try {
 			Tarefa entity = repositorio.getReferenceById(id);
 			if(entity.getDepartamento().getId() == (dto.getIdDepartamento())) {
-				copyyDtoToEntityInsertPessoa(dto, entity);
+				copyyDtoToEntityAlocarPessoa(dto, entity);
 				entity = repositorio.save(entity);
+			}else {
+				throw new ResourceNotFoundException("Deparmento tem que não pode ser diferente");
 			}
 			return new TarefaDTO(entity);
 		}
@@ -81,7 +111,7 @@ public class TarefaServico {
 		entity.setPessoa(null);
 	}
 		
-	private void copyyDtoToEntityInsertPessoa(TarefaDTO dto, Tarefa entity) {
+	private void copyyDtoToEntityAlocarPessoa(TarefaDTO dto, Tarefa entity) {
 		
 		entity.setTitulo(dto.getTitulo());
 		entity.setDescricao(dto.getDescricao());
@@ -100,6 +130,32 @@ public class TarefaServico {
 		entity.setFinalizado(dto.isFinalizado());
 		Departamento departamento = departamentoRepositorio.getReferenceById(dto.getIdDepartamento());
 		entity.setDepartamento(departamento);
+	}
+	
+	public Long totalHorasGastasPorTodasTarefas(Long id) {
+		
+		LocalDateTime dataAtual = LocalDateTime.now();
+		List<Long> listHorasTarefasAlocadas = new ArrayList<>();
+		Long totalHorasGastasNasTarefas = 0L;
+		try {
+			List<Tarefa> listTarefas = repositorio.findAll();
+			
+			for(Tarefa t : listTarefas) {
+				LocalDateTime dataInicio = t.getPrazo().plusDays(- t.getDuracao());
+				if(t.getPessoa() != null) {
+					if(id == t.getPessoa().getId()) {
+						listHorasTarefasAlocadas.add(Duration.between(dataInicio, dataAtual).toHours());
+					}
+				}
+			}
+			for(Long l : listHorasTarefasAlocadas) {
+				totalHorasGastasNasTarefas += l;
+			}
+			 
+		}catch (EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException("Id not found " + id);
+		}
+		return totalHorasGastasNasTarefas;
 	}
 
 

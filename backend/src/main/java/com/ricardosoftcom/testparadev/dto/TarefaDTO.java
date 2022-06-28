@@ -16,6 +16,7 @@ public class TarefaDTO implements Serializable{
 	private boolean finalizado;
 	private Long idDepartamento;
 	private Long idPessoa;
+	private String Mensagem;
 	
 	public TarefaDTO() {
 	}
@@ -40,7 +41,11 @@ public class TarefaDTO implements Serializable{
 		duracao = entity.getDuracao();
 		finalizado = entity.isFinalizado();
 		idDepartamento = entity.getDepartamento().getId();
-		idPessoa = entity.getPessoa().getId();
+		if(entity.getPessoa() == null) {
+			idPessoa = null;
+		}else {
+			idPessoa = entity.getPessoa().getId();
+		}
 	}
 
 	public Long getId() {
@@ -106,4 +111,14 @@ public class TarefaDTO implements Serializable{
 	public void setIdPessoa(Long idPessoa) {
 		this.idPessoa = idPessoa;
 	}
+
+	public String getMensagem() {
+		return Mensagem;
+	}
+
+	public void setMensagem(String mensagem) {
+		Mensagem = mensagem;
+	}
+	
+	
 }

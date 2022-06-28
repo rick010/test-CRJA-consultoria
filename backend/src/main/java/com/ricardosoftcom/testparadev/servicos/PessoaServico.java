@@ -40,8 +40,7 @@ public class PessoaServico {
 	@Transactional(readOnly = true)
 	public Page<PessoaDTO> findAllPaged(Pageable pageable) {
 		Page<Pessoa> list = repositorio.findAll(pageable);
-//		return list.map(x -> new PessoaDTO(x, totalHorasGastasPorTarefas(x.getId())));
-		return list.map(x -> new PessoaDTO(x));
+		return list.map(x -> new PessoaDTO(x, totalHorasGastasPorTodasTarefas(x.getId())));
 	}
 	
 	@Transactional(readOnly = true)
@@ -49,8 +48,8 @@ public class PessoaServico {
 		List<Pessoa> list = repositorio.findAll();
 		List<PessoaDTO> listDTO = new ArrayList<>();
 		for(Pessoa p : list) {
-			Long media = totalHorasGastasPorTarefas(p.getId())/listTodasTarefasDaPessoa(p.getId()).size();
-			listDTO.add(new PessoaDTO(p, totalHorasGastasPorTarefas(p.getId()), media));
+			Long media = totalHorasGastasPorTodasTarefas(p.getId())/listTodasTarefasDaPessoa(p.getId()).size();
+			listDTO.add(new PessoaDTO(p, totalHorasGastasPorTodasTarefas(p.getId()), media));
 		}
 		return listDTO;
 	}
@@ -92,9 +91,10 @@ public class PessoaServico {
 			List<Tarefa> listTarefas = tarefaRepositorio.findAll();
 			
 			for(Tarefa t : listTarefas) {
-				
-				if(id == t.getPessoa().getId()) {
-				listTarefasPessoa.add(t);
+				if(t.getPessoa() != null) {
+					if(id == t.getPessoa().getId()) {
+					listTarefasPessoa.add(t);
+				}
 				}
 			}
 		}catch (EmptyResultDataAccessException e) {
@@ -103,7 +103,7 @@ public class PessoaServico {
 		return listTarefasPessoa;
 	}
 	
-	public Long totalHorasGastasPorTarefas(Long id) {
+	public Long totalHorasGastasPorTarefasAlocadas(Long id) {
 		
 		LocalDateTime dataAtual = LocalDateTime.now();
 		List<Long> listHorasTarefasAlocadas = new ArrayList<>();
@@ -113,8 +113,36 @@ public class PessoaServico {
 			
 			for(Tarefa t : listTarefas) {
 				LocalDateTime dataInicio = t.getPrazo().plusDays(- t.getDuracao());
-				if(!t.isFinalizado() && id == t.getPessoa().getId()) {
-					listHorasTarefasAlocadas.add(Duration.between(dataInicio, dataAtual).toHours());
+				if(t.getPessoa() != null) {
+					if(!t.isFinalizado() && id == t.getPessoa().getId()) {
+						listHorasTarefasAlocadas.add(Duration.between(dataInicio, dataAtual).toHours());
+					}
+				}
+			}
+			for(Long l : listHorasTarefasAlocadas) {
+				totalHorasGastasNasTarefas += l;
+			}
+			 
+		}catch (EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException("Id not found " + id);
+		}
+		return totalHorasGastasNasTarefas;
+	}
+	
+	public Long totalHorasGastasPorTodasTarefas(Long id) {
+		
+		LocalDateTime dataAtual = LocalDateTime.now();
+		List<Long> listHorasTarefasAlocadas = new ArrayList<>();
+		Long totalHorasGastasNasTarefas = 0L;
+		try {
+			List<Tarefa> listTarefas = tarefaRepositorio.findAll();
+			
+			for(Tarefa t : listTarefas) {
+				LocalDateTime dataInicio = t.getPrazo().plusDays(- t.getDuracao());
+				if(t.getPessoa() != null) {
+					if(id == t.getPessoa().getId()) {
+						listHorasTarefasAlocadas.add(Duration.between(dataInicio, dataAtual).toHours());
+					}
 				}
 			}
 			for(Long l : listHorasTarefasAlocadas) {

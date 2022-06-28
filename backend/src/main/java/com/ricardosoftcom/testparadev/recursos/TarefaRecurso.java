@@ -1,10 +1,9 @@
 package com.ricardosoftcom.testparadev.recursos;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,24 +25,29 @@ public class TarefaRecurso {
 	TarefaServico servico;
 	
 	@GetMapping
-	public ResponseEntity<Page<TarefaDTO>> findAll(Pageable pageable) {
+	public ResponseEntity<List<TarefaDTO>> todasTarefas() {
+		List<TarefaDTO> list = servico.todasTarefas();
+		return ResponseEntity.ok().body(list);
+	}
+	
+	@GetMapping(value = "/pendentes")
+	public ResponseEntity<List<TarefaDTO>> tarefasSemPessoasAlocadas() {
 		
-		Page<TarefaDTO> list = servico.findAllPaged(pageable);
-		
+		List<TarefaDTO> list = servico.tarefasSemPessoasAlocadas();
 		return ResponseEntity.ok().body(list);
 	}
 	
 	@PostMapping
-	public ResponseEntity<TarefaDTO> insert(@RequestBody TarefaDTO dto) {
-		dto = servico.alocarPessoa(dto);
+	public ResponseEntity<TarefaDTO> adicionarTarefa(@RequestBody TarefaDTO dto) {
+		dto = servico.adicionarTarefa(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(dto);
 	}
 	
 	@PutMapping(value = "/alocar/{id}")
-	public ResponseEntity<TarefaDTO> insertPessoaNaTarefa(@PathVariable Long id, @RequestBody TarefaDTO dto) {
-		dto = servico.insertPessoaNaTarefa(id, dto);
+	public ResponseEntity<TarefaDTO> alocarPessoaNaTarefa(@PathVariable Long id, @RequestBody TarefaDTO dto) {
+		dto = servico.alocarPessoaNaTarefa(id, dto);
 		return ResponseEntity.ok().body(dto);
 	}
 	
