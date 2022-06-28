@@ -25,7 +25,7 @@ public class PessoaDTO implements Serializable{
 	public PessoaDTO(Pessoa entity) {
 		id = entity.getId();
 		nome = entity.getNome();
-		idDepartamento = entity.getDepartamento().getId();
+		idDepartamento = entity.getPessoaDepartamento().getId();
 	}
 	
 	public PessoaDTO(Pessoa entity, Long horasTrabalhadas) {

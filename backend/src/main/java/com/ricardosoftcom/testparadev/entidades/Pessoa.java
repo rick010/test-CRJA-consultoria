@@ -56,21 +56,21 @@ public class Pessoa implements Serializable{
 		this.nome = nome;
 	}
 
-	public Departamento getDepartamento() {
-		return pessoaDepartamento;
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 
-	public void setDepartamento(Departamento pessoaDepartamento) {
+	public Departamento getPessoaDepartamento() {
+		return pessoaDepartamento;
+	}
+	public void setPessoaDepartamento(Departamento pessoaDepartamento) {
 		this.pessoaDepartamento = pessoaDepartamento;
 	}
 
 	public Set<Tarefa> getTarefas() {
 		return tarefas;
 	}
-
-	public void setTarefas(Set<Tarefa> tarefas) {
-		this.tarefas = tarefas;
-	}
+	
 
 	@Override
 	public int hashCode() {

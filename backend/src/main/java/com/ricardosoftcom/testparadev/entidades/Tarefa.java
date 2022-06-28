@@ -120,8 +120,15 @@ public class Tarefa implements Serializable{
 	public void setPessoa(Pessoa pessoa) {
 		this.pessoa = pessoa;
 	}
-	
-	
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -134,4 +141,6 @@ public class Tarefa implements Serializable{
 		Tarefa other = (Tarefa) obj;
 		return Objects.equals(id, other.id);
 	}
+
+	
 }

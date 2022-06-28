@@ -15,42 +15,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ricardosoftcom.testparadev.dto.PessoaDTO;
-import com.ricardosoftcom.testparadev.servicos.PessoaServico;
+import com.ricardosoftcom.testparadev.dto.TarefaDTO;
+import com.ricardosoftcom.testparadev.servicos.TarefaServico;
 
 @RestController
-@RequestMapping(value = "/pessoas")
-public class PessoaRecurso {
-
+@RequestMapping(value = "/tarefas")
+public class TarefaRecurso {
+	
 	@Autowired
-	private PessoaServico servico;
-
+	TarefaServico servico;
+	
 	@GetMapping
-	public ResponseEntity<Page<PessoaDTO>> findAll(Pageable pageable) {
+	public ResponseEntity<Page<TarefaDTO>> findAll(Pageable pageable) {
 		
-		Page<PessoaDTO> list = servico.findAllPaged(pageable);
+		Page<TarefaDTO> list = servico.findAllPaged(pageable);
 		
 		return ResponseEntity.ok().body(list);
 	}
 	
-//	@GetMapping(value = "/gastos")
-//	public ResponseEntity<List<PessoaDTO>> findByAverageHoursSpentByTasks() {
-//		
-//		List<PessoaDTO> list = servico.findByAverageHoursSpentByTasks();
-//		return ResponseEntity.ok().body(list);
-//	}
-	
 	@PostMapping
-	public ResponseEntity<PessoaDTO> insert(@RequestBody PessoaDTO dto) {
-		dto = servico.insert(dto);
+	public ResponseEntity<TarefaDTO> insert(@RequestBody TarefaDTO dto) {
+		dto = servico.insertPessoa(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(dto);
 	}
 	
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<PessoaDTO> update(@PathVariable Long id, @RequestBody PessoaDTO dto) {
-		dto = servico.update(id, dto);
+	@PutMapping(value = "/alocar/{id}")
+	public ResponseEntity<TarefaDTO> insertPessoaNaTarefa(@PathVariable Long id, @RequestBody TarefaDTO dto) {
+		dto = servico.insertPessoaNaTarefa(id, dto);
 		return ResponseEntity.ok().body(dto);
 	}
+
 }

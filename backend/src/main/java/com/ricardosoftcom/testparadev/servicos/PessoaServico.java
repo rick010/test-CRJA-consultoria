@@ -125,6 +125,6 @@ public class PessoaServico {
 	private void copyyDtoToEntity(PessoaDTO dto, Pessoa entity) {
 		
 		entity.setNome(dto.getNome());
-		entity.setDepartamento(new Departamento(dto.getIdDepartamento(), null));
+		entity.setPessoaDepartamento(new Departamento(dto.getIdDepartamento(), null));
 		}
-	}
+}
