@@ -35,7 +35,7 @@ public class TarefaRecurso {
 	
 	@PostMapping
 	public ResponseEntity<TarefaDTO> insert(@RequestBody TarefaDTO dto) {
-		dto = servico.insertPessoa(dto);
+		dto = servico.alocarPessoa(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(dto);
@@ -44,6 +44,12 @@ public class TarefaRecurso {
 	@PutMapping(value = "/alocar/{id}")
 	public ResponseEntity<TarefaDTO> insertPessoaNaTarefa(@PathVariable Long id, @RequestBody TarefaDTO dto) {
 		dto = servico.insertPessoaNaTarefa(id, dto);
+		return ResponseEntity.ok().body(dto);
+	}
+	
+	@PutMapping(value = "/finalizar/{id}")
+	public ResponseEntity<TarefaDTO> finalizarTarefa(@PathVariable Long id, @RequestBody TarefaDTO dto) {
+		dto = servico.finalizarTarefa(id, dto);
 		return ResponseEntity.ok().body(dto);
 	}
 

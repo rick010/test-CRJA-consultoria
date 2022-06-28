@@ -1,6 +1,7 @@
 package com.ricardosoftcom.testparadev.recursos;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,12 +34,12 @@ public class PessoaRecurso {
 		return ResponseEntity.ok().body(list);
 	}
 	
-//	@GetMapping(value = "/gastos")
-//	public ResponseEntity<List<PessoaDTO>> findByAverageHoursSpentByTasks() {
-//		
-//		List<PessoaDTO> list = servico.findByAverageHoursSpentByTasks();
-//		return ResponseEntity.ok().body(list);
-//	}
+	@GetMapping(value = "/gastos")
+	public ResponseEntity<List<PessoaDTO>> findByAverageHoursSpentByTasks() {
+		
+		List<PessoaDTO> list = servico.findByAverageHoursSpentByTasks();
+		return ResponseEntity.ok().body(list);
+	}
 	
 	@PostMapping
 	public ResponseEntity<PessoaDTO> insert(@RequestBody PessoaDTO dto) {

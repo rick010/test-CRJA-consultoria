@@ -19,6 +19,7 @@ import com.ricardosoftcom.testparadev.dto.PessoaDTO;
 import com.ricardosoftcom.testparadev.entidades.Departamento;
 import com.ricardosoftcom.testparadev.entidades.Pessoa;
 import com.ricardosoftcom.testparadev.entidades.Tarefa;
+import com.ricardosoftcom.testparadev.repositorios.DepartamentoRepositorio;
 import com.ricardosoftcom.testparadev.repositorios.PessoaRepositorio;
 import com.ricardosoftcom.testparadev.repositorios.TarefaRepositorio;
 import com.ricardosoftcom.testparadev.servicos.exceptions.DatabaseException;
@@ -28,15 +29,19 @@ import com.ricardosoftcom.testparadev.servicos.exceptions.ResourceNotFoundExcept
 public class PessoaServico {
 	
 	@Autowired
-	private PessoaRepositorio repositorio;
+	PessoaRepositorio repositorio;
 	
 	@Autowired
-	private TarefaRepositorio tarefaRepositorio;
+	TarefaRepositorio tarefaRepositorio;
+	
+	@Autowired
+	DepartamentoRepositorio departamentoRepositorio;
 	
 	@Transactional(readOnly = true)
 	public Page<PessoaDTO> findAllPaged(Pageable pageable) {
 		Page<Pessoa> list = repositorio.findAll(pageable);
-		return list.map(x -> new PessoaDTO(x, totalHorasGastasPorTarefas(x.getId())));
+//		return list.map(x -> new PessoaDTO(x, totalHorasGastasPorTarefas(x.getId())));
+		return list.map(x -> new PessoaDTO(x));
 	}
 	
 	@Transactional(readOnly = true)
@@ -125,6 +130,7 @@ public class PessoaServico {
 	private void copyyDtoToEntity(PessoaDTO dto, Pessoa entity) {
 		
 		entity.setNome(dto.getNome());
-		entity.setPessoaDepartamento(new Departamento(dto.getIdDepartamento(), null));
+		Departamento departamento = departamentoRepositorio.getReferenceById(dto.getIdDepartamento());
+		entity.setPessoaDepartamento(departamento);
 		}
 }
