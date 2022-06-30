@@ -54,6 +54,30 @@ public class PessoaServico {
 		return listDTO;
 	}
 	
+	@Transactional(readOnly = true)
+	public PessoaDTO retorPessoaComMaiorQuantHorasPorMes(int mesInt) {
+		
+		List<Pessoa> list = repositorio.findAll();
+		Pessoa pMaiorHoras = new Pessoa();
+		Long totalHoras = 0L;
+		Long axuMaiorHoras = 0L;
+		for(Pessoa p : list) {
+			for(Tarefa t : p.getTarefas()) {
+				if(t.getPrazo().getMonthValue() == mesInt) {
+					LocalDateTime dataInicio = t.getPrazo().plusDays(- t.getDuracao());
+					totalHoras += (Duration.between(dataInicio, t.getPrazo()).toHours());
+				}
+			}
+			if(totalHoras > axuMaiorHoras) {
+				axuMaiorHoras = totalHoras;
+				pMaiorHoras = p;
+			}
+		}
+		PessoaDTO pMaiorHorasDTO = new PessoaDTO(pMaiorHoras);
+		pMaiorHorasDTO.setHorasTrabalhadas(axuMaiorHoras);
+		return pMaiorHorasDTO;
+	}
+	
 	@Transactional
 	public PessoaDTO insert(PessoaDTO dto) {
 		Pessoa entity = new Pessoa();

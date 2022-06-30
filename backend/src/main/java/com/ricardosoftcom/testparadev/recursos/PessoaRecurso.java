@@ -29,17 +29,20 @@ public class PessoaRecurso {
 
 	@GetMapping
 	public ResponseEntity<Page<PessoaDTO>> findAll(Pageable pageable) {
-		
 		Page<PessoaDTO> list = servico.findAllPaged(pageable);
-		
 		return ResponseEntity.ok().body(list);
 	}
 	
 	@GetMapping(value = "/gastos")
-	public ResponseEntity<List<PessoaDTO>> findByAverageHoursSpentByTasks() {
-		
+	public ResponseEntity<List<PessoaDTO>> findByAverageHoursSpentByTasks() {	
 		List<PessoaDTO> list = servico.findByAverageHoursSpentByTasks();
 		return ResponseEntity.ok().body(list);
+	}
+	
+	@GetMapping(value = "/maiorgasto/{mesInt}")
+	public ResponseEntity<PessoaDTO> retorPessoaComMaiorQuantHorasPorMes(@PathVariable int mesInt) {	
+		PessoaDTO dto = servico.retorPessoaComMaiorQuantHorasPorMes(mesInt);
+		return ResponseEntity.ok().body(dto);
 	}
 	
 	@PostMapping

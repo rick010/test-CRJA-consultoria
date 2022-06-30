@@ -10,6 +10,7 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,7 @@ public class TarefaServico {
 	
 	@Transactional(readOnly = true)
 	public List<TarefaDTO> todasTarefas() {
-		List<Tarefa> list = repositorio.findAll(Sort.by("prazo"));
+		List<Tarefa> list = repositorio.findAll(Sort.by(Direction.ASC,"prazo"));
 		List<TarefaDTO> listTarefa = new ArrayList<>();
 		for(Tarefa t : list) {
 			TarefaDTO dto = new TarefaDTO(t);
@@ -102,9 +103,15 @@ public class TarefaServico {
 	}
 	private void copyyDtoToEntityfinalizarTarefa(TarefaDTO dto, Tarefa entity) {
 		
+		LocalDateTime dataAtual = LocalDateTime.now();
+		LocalDateTime dataInicio = entity.getPrazo().plusDays(- entity.getDuracao());
+		int duracao = dataAtual.getDayOfMonth() - dataInicio.getDayOfMonth();
+		LocalDateTime prazoAtualizado = dataInicio.plusDays(duracao);
+		Duration.between(dataInicio, dataAtual);
 		entity.setTitulo(dto.getTitulo());
 		entity.setDescricao(dto.getDescricao());
-		entity.setDuracao(dto.getDuracao());
+		entity.setPrazo(prazoAtualizado);
+		entity.setDuracao(duracao);
 		entity.setFinalizado(true);
 		Departamento departamento = departamentoRepositorio.getReferenceById(dto.getIdDepartamento());
 		entity.setDepartamento(departamento);

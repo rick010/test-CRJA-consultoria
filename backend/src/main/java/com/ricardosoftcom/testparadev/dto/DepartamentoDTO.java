@@ -1,13 +1,8 @@
 package com.ricardosoftcom.testparadev.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import com.ricardosoftcom.testparadev.entidades.Departamento;
-import com.ricardosoftcom.testparadev.entidades.Pessoa;
-import com.ricardosoftcom.testparadev.entidades.Tarefa;
 
 public class DepartamentoDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -15,9 +10,12 @@ public class DepartamentoDTO implements Serializable{
 	private Long id;
 	private String titulo;
 	
-	private List<PessoaDTO> pessoas = new ArrayList<>();
+	private Long quantidadePessoas = 0L;
 	
-	private List<TarefaDTO> tarefas = new ArrayList<>();
+	private Long quantidadeTarefas = 0L;
+	
+	private Long QuantidadeTarefasFinalizadas = 0L;
+	private Long QuantidadeTarefasNãoFinalizadas = 0L;
 	
 	public DepartamentoDTO() {
 	}
@@ -31,12 +29,6 @@ public class DepartamentoDTO implements Serializable{
 		id = entity.getId();
 		titulo = entity.getTitulo();
 	}
-	
-	public DepartamentoDTO(Departamento entity, Set<Pessoa> pessoas, List<Tarefa> tarefas) {
-		this(entity);
-		pessoas.forEach(p -> this.pessoas.add(new PessoaDTO(p)));
-		tarefas.forEach(t -> this.tarefas.add(new TarefaDTO(t)));
-	}
 
 	public Long getId() {
 		return id;
@@ -46,19 +38,41 @@ public class DepartamentoDTO implements Serializable{
 		this.id = id;
 	}
 
-	public List<PessoaDTO> getPessoas() {
-		return pessoas;
-	}
-
-	public void setPessoas(List<PessoaDTO> pessoas) {
-		this.pessoas = pessoas;
-	}
-
 	public String getTitulo() {
 		return titulo;
 	}
 
-	public List<TarefaDTO> getTarefas() {
-		return tarefas;
+	public Long getQuantidadePessoas() {
+		return quantidadePessoas;
 	}
+
+	public void setQuantidadePessoas(Long quantidadePessoas) {
+		this.quantidadePessoas = quantidadePessoas;
+	}
+
+	public Long getQuantidadeTarefas() {
+		return quantidadeTarefas;
+	}
+
+	public void setQuantidadeTarefas(Long quantidadeTarefas) {
+		this.quantidadeTarefas = quantidadeTarefas;
+	}
+
+	public Long getQuantidadeTarefasFinalizadas() {
+		return QuantidadeTarefasFinalizadas;
+	}
+
+	public void setQuantidadeTarefasFinalizadas(Long quantidadeTarefasFinalizadas) {
+		QuantidadeTarefasFinalizadas = quantidadeTarefasFinalizadas;
+	}
+
+	public Long getQuantidadeTarefasNãoFinalizadas() {
+		return QuantidadeTarefasNãoFinalizadas;
+	}
+
+	public void setQuantidadeTarefasNãoFinalizadas(Long quantidadeTarefasNãoFinalizadas) {
+		QuantidadeTarefasNãoFinalizadas = quantidadeTarefasNãoFinalizadas;
+	}
+	
+	
 }

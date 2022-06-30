@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,7 +38,7 @@ public class Tarefa implements Serializable{
 	@JoinColumn(name = "id_departamento")
 	private Departamento departamento;
 	
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "id_pessoa")
 	private Pessoa pessoa;
 	
@@ -88,6 +89,10 @@ public class Tarefa implements Serializable{
 
 	public Integer getDuracao() {
 		return duracao;
+	}
+	
+	public void setPrazo(LocalDateTime prazo) {
+		this.prazo = prazo;
 	}
 
 	public void setDuracao(Integer duracao) {
